@@ -38,6 +38,44 @@ ColumnLayout {
     id: remoteNodeList
     spacing: 20
 
+    MoneroComponents.RemoteNodeEdit {
+        id: quickRemoteNode
+        Layout.fillWidth: true
+        daemonAddrLabelText: qsTr("Remote RPC address") + translationManager.emptyString
+        daemonPortLabelText: qsTr("Port") + translationManager.emptyString
+        daemonPortText: "48080"
+        placeholderFontSize: 15
+    }
+
+    RowLayout {
+        Layout.fillWidth: true
+        spacing: 12
+
+        MoneroComponents.StandardButton {
+            Layout.alignment: Qt.AlignLeft
+            small: true
+            enabled: quickRemoteNode.getAddress() !== ""
+            text: qsTr("Use this node") + translationManager.emptyString
+            onClicked: {
+                const node = {
+                    address: quickRemoteNode.getAddress(),
+                    username: "",
+                    password: "",
+                    trusted: false
+                };
+                const idx = remoteNodesModel.appendIfNotExists(node);
+                remoteNodesModel.applyRemoteNode(idx);
+            }
+        }
+
+        MoneroComponents.TextPlain {
+            Layout.fillWidth: true
+            wrapMode: Text.Wrap
+            color: MoneroComponents.Style.dimmedFontColor
+            text: qsTr("Provide your own RPC endpoint; no default remote nodes are bundled.") + translationManager.emptyString
+        }
+    }
+
     MoneroComponents.CheckBox {
         border: false
         checkedIcon: FontAwesome.minusCircle

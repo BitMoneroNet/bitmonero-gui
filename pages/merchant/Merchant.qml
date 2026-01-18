@@ -449,7 +449,7 @@ Item {
                         font.pixelSize: 14
                         font.bold: false
                         color: "white"
-                        text: qsTr("Amount to receive") + " (XMR)" + translationManager.emptyString
+                        text: qsTr("Amount to receive") + " (BMR)" + translationManager.emptyString
                         themeTransition: false
                     }
 
@@ -485,9 +485,9 @@ Item {
                                     amountToReceive.text = '0' + amountToReceive.text;
                                 }
                             }
-                            validator: RegExpValidator {
-                                regExp: /^(\d{1,8})?([\.]\d{1,12})?$/
-                            }
+                        validator: RegExpValidator {
+                            regExp: /^(\d{1,9})?([\.]\d{1,11})?$/
+                        }
                         }
                     }
 

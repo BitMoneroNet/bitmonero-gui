@@ -222,7 +222,7 @@ Rectangle{
                     wrapMode: Text.WordWrap;
                     leftPadding: 0
                     topPadding: 0
-                    text: qsTr("Uses a third-party server to connect to the Monero network. Less secure, but easier on your computer.") + translationManager.emptyString
+                    text: qsTr("Connects to the Bitmonero network through a remote RPC you provide. Pick a server you run or explicitly trust.") + translationManager.emptyString
                     width: parent.width - (remoteNodeIcon.width + remoteNodeIcon.anchors.leftMargin + anchors.leftMargin)
                 }
 
@@ -251,7 +251,7 @@ Rectangle{
 
         MoneroComponents.WarningBox {
             Layout.topMargin: 46
-            text: qsTr("To find a remote node, type 'Monero remote node' into your favorite search engine. Please ensure the node is run by a trusted third-party.") + translationManager.emptyString
+            text: qsTr("Enter your own Bitmonero RPC address (host:port). No default remote nodes are bundled; choose a node you operate or explicitly trust.") + translationManager.emptyString
             visible: persistentSettings.useRemoteNode
         }
 
@@ -355,4 +355,3 @@ Rectangle{
         }
     }
 }
-
