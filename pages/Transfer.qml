@@ -394,7 +394,7 @@ Rectangle {
                                 wrapMode: Text.WrapAnywhere
                                 placeholderText: {
                                     if(persistentSettings.nettype == NetworkType.MAINNET){
-                                        return "4.. / 8.. / monero:.. / OpenAlias";
+                                        return "ZB.. / BZ.. / monero:.. / OpenAlias";
                                     } else if (persistentSettings.nettype == NetworkType.STAGENET){
                                         return "5.. / 7.. / monero:..";
                                     } else if(persistentSettings.nettype == NetworkType.TESTNET){
@@ -1045,7 +1045,7 @@ Rectangle {
                 informationPopup.open();
             } else {
                 informationPopup.title = qsTr("Information") + translationManager.emptyString
-                informationPopup.text  = qsTr("Monero sent successfully") + translationManager.emptyString
+                informationPopup.text  = qsTr("BitMonero sent successfully") + translationManager.emptyString
                 informationPopup.icon  = StandardIcon.Information
                 informationPopup.onCloseCallback = null
                 informationPopup.open();

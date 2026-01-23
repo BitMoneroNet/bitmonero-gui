@@ -96,6 +96,26 @@ bool DaemonManager::start(const QString &flags, NetworkType::Type nettype, const
         arguments << "--no-sync";
     }
 
+    const auto ports = defaultPorts(nettype);
+    const auto hasFlag = [](const QStringList &args, const QString &flag) {
+        for (const auto &arg : args) {
+            if (arg.startsWith(flag)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    if (!hasFlag(arguments, "--p2p-bind-port")) {
+        arguments << "--p2p-bind-port" << QString::number(ports.p2p);
+    }
+    if (!hasFlag(arguments, "--rpc-bind-port")) {
+        arguments << "--rpc-bind-port" << QString::number(ports.rpc);
+    }
+    if (!hasFlag(arguments, "--zmq-rpc-bind-port") && !hasFlag(arguments, "--zmq-pub")) {
+        arguments << "--zmq-rpc-bind-port" << QString::number(ports.zmq);
+    }
+
     arguments << "--check-updates" << "disabled";
     arguments << "--non-interactive";
 
@@ -105,6 +125,10 @@ bool DaemonManager::start(const QString &flags, NetworkType::Type nettype, const
     if(!flags.contains("--max-concurrency", Qt::CaseSensitive)){
         arguments << "--max-concurrency" << QString::number(concurrency);
     }
+
+    const QString portSummary = QString("daemon ports -> p2p:%1 rpc:%2 zmq:%3").arg(ports.p2p).arg(ports.rpc).arg(ports.zmq);
+    emit daemonConsoleUpdated(portSummary);
+    qDebug() << portSummary;
 
     qDebug() << "starting monerod " + m_monerod;
     qDebug() << "With command line arguments " << arguments;
@@ -135,6 +159,8 @@ bool DaemonManager::start(const QString &flags, NetworkType::Type nettype, const
             emit daemonStarted();
             m_noSync = noSync;
         } else {
+            const auto ports = defaultPorts(nettype);
+            emit daemonConsoleUpdated(tr("Local node did not open RPC port %1 within %2 seconds").arg(QString::number(ports.rpc)).arg(DAEMON_START_TIMEOUT_SECONDS));
             emit daemonStartFailure(tr("Timed out, local node is not responding after %1 seconds").arg(DAEMON_START_TIMEOUT_SECONDS));
         }
     });
@@ -279,8 +305,30 @@ bool DaemonManager::sendCommand(const QStringList &cmd, NetworkType::Type nettyp
 
     bool started = p.waitForFinished(-1);
     message = p.readAllStandardOutput();
-    emit daemonConsoleUpdated(message);
-    return started;
+    const QString stderrOutput = p.readAllStandardError();
+    const int exitCode = p.exitCode();
+    const auto exitStatus = p.exitStatus();
+
+    if (!message.isEmpty()) {
+        emit daemonConsoleUpdated(message);
+    }
+
+    if (!stderrOutput.isEmpty()) {
+        const QString errLine = QStringLiteral("Daemon stderr: %1").arg(stderrOutput.trimmed());
+        emit daemonConsoleUpdated(errLine);
+        qWarning() << errLine;
+    }
+
+    if (!started || exitStatus != QProcess::NormalExit || exitCode != 0) {
+        const QString errorDetail = QStringLiteral("Command '%1' failed (exit %2, status %3)")
+                                    .arg(external_cmd.join(" "))
+                                    .arg(exitCode)
+                                    .arg(exitStatus == QProcess::NormalExit ? QStringLiteral("normal") : QStringLiteral("crashed"));
+        emit daemonConsoleUpdated(errorDetail);
+        qWarning() << errorDetail;
+    }
+
+    return started && exitStatus == QProcess::NormalExit && exitCode == 0;
 }
 
 void DaemonManager::sendCommandAsync(const QStringList &cmd, NetworkType::Type nettype, const QString &dataDir, const QJSValue& callback) const
@@ -391,6 +439,19 @@ QString DaemonManager::getArgs(const QString &dataDir) {
         args = "";
     }
     return args;
+}
+
+DaemonManager::Ports DaemonManager::defaultPorts(NetworkType::Type nettype) const
+{
+    switch (nettype) {
+    case NetworkType::TESTNET:
+        return {58080, 58081, 58082};
+    case NetworkType::STAGENET:
+        return {64080, 64081, 64082};
+    case NetworkType::MAINNET:
+    default:
+        return {48080, 48081, 48082};
+    }
 }
 
 DaemonManager::DaemonManager(QObject *parent)

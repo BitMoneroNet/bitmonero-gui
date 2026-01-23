@@ -74,7 +74,7 @@ Rectangle {
 
         MoneroComponents.TextPlain {
             id: soloMainLabel
-            text: qsTr("Mining with your computer helps strengthen the Monero network. The more people mine, the harder it is for the network to be attacked, and every little bit helps.\n\nMining also gives you a small chance to earn some Monero. Your computer will create hashes looking for block solutions. If you find a block, you will get the associated reward. Good luck!") + "\n\n" + qsTr("P2Pool mining is a decentralized way to pool mine that pays out more frequently compared to solo mining, while also supporting the network.") + translationManager.emptyString
+            text: qsTr("Mining with your computer helps strengthen the BitMonero network. The more people mine, the harder it is for the network to be attacked, and every little bit helps.\n\nMining also gives you a small chance to earn some BitMonero. Your computer will create hashes looking for block solutions. If you find a block, you will get the associated reward. Good luck!") + "\n\n" + qsTr("P2Pool mining is a decentralized way to pool mine that pays out more frequently compared to solo mining, while also supporting the network.") + translationManager.emptyString
             wrapMode: Text.Wrap
             Layout.fillWidth: true
             font.family: MoneroComponents.Style.fontRegular.name
@@ -286,16 +286,14 @@ Rectangle {
                         primary: !stopSoloMinerButton.enabled
                         text: qsTr("Start mining") + translationManager.emptyString
                         onClicked: {
-                            var daemonReady = appWindow.daemonSynced && appWindow.daemonRunning && !persistentSettings.useRemoteNode
-                            if (persistentSettings.allowRemoteNodeMining) {
-                                daemonReady = persistentSettings.useRemoteNode && appWindow.daemonSynced
-                            }
+                            // Allow start if the daemon is running and either local or remote mining is explicitly allowed.
+                            var daemonReady = appWindow.daemonRunning && (!persistentSettings.useRemoteNode || persistentSettings.allowRemoteNodeMining)
                             if (daemonReady) {
                                 var success;
                                 if (persistentSettings.allow_p2pool_mining) {
                                     if (p2poolManager.isInstalled()) {
                                         args = daemonManager.getArgs(persistentSettings.blockchainDataDir) //updates arguments
-                                        if (persistentSettings.allowRemoteNodeMining || (args.includes("--zmq-pub tcp://127.0.0.1:18083") || args.includes("--zmq-pub=tcp://127.0.0.1:18083")) && !args.includes("--no-zmq")) {
+                                        if (persistentSettings.allowRemoteNodeMining || (args.includes("--zmq-pub tcp://127.0.0.1:48083") || args.includes("--zmq-pub=tcp://127.0.0.1:48083")) && !args.includes("--no-zmq")) {
                                             startP2Pool()
                                         }
                                         else {
@@ -320,15 +318,15 @@ Rectangle {
                                 }
                                 else 
                                 {
-                                    success = walletManager.startMining(appWindow.currentWallet.address(0, 0), threads, persistentSettings.allow_background_mining, persistentSettings.miningIgnoreBattery)
-                                    if (success) 
-                                    {
-                                        update()
-                                    } 
-                                    else 
-                                    {
-                                        miningError(qsTr("Couldn't start mining.<br>") + translationManager.emptyString)
-                                    }
+                                    // Issue the same start_mining command the log console uses (split string).
+                                    var cmdString = "start_mining " + appWindow.currentWallet.address(0, 0) + " " + threads + " false true"
+                                    daemonManager.sendCommandAsync(cmdString.split(" "), currentWallet.nettype, persistentSettings.blockchainDataDir, function(result) {
+                                        if (result === true) {
+                                            update()
+                                        } else {
+                                            miningError(qsTr("Couldn't start mining.<br>") + translationManager.emptyString)
+                                        }
+                                    })
                                 }
                             }
                             else {
@@ -451,8 +449,8 @@ Rectangle {
                     Usage:<br>
                         --wallet              Wallet address to mine to. Subaddresses and integrated addresses are not supported!<br>
                         --host                IP address of your Monero node, default is 127.0.0.1<br>
-                        --rpc-port            monerod RPC API port number, default is 18081<br>
-                        --zmq-port            monerod ZMQ pub port number, default is 18083 (same port as in monerod\'s \"--zmq-pub\" command line parameter)<br>
+                        --rpc-port            monerod RPC API port number, default is 48081<br>
+                        --zmq-port            monerod ZMQ pub port number, default is 48083 (same port as in monerod\'s \"--zmq-pub\" command line parameter)<br>
                         --stratum             Comma-separated list of IP:port for stratum server to listen on<br>
                         --p2p                 Comma-separated list of IP:port for p2p server to listen on<br>
                         --addpeers            Comma-separated list of IP:port of other p2pool nodes to connect to<br>
@@ -607,11 +605,11 @@ Rectangle {
         var noSync = false;
         //these args will be deleted because DaemonManager::start will re-add them later.
         //--no-zmq must be deleted. removing '--zmq-pub=tcp...' lets us blindly add '--zmq-pub tcp...' later without risking duplication.
-        var defaultArgs = ["--detach","--data-dir","--bootstrap-daemon-address","--prune-blockchain","--no-sync","--check-updates","--non-interactive","--max-concurrency","--no-zmq","--zmq-pub=tcp://127.0.0.1:18083"]
+        var defaultArgs = ["--detach","--data-dir","--bootstrap-daemon-address","--prune-blockchain","--no-sync","--check-updates","--non-interactive","--max-concurrency","--no-zmq","--zmq-pub=tcp://127.0.0.1:48083"]
         var customDaemonArgsArray = args.split(' ');
         var flag = "";
         var allArgs = [];
-        var p2poolArgs = ["--zmq-pub tcp://127.0.0.1:18083"];
+        var p2poolArgs = ["--zmq-pub tcp://127.0.0.1:48083"];
         //create an array (allArgs) of ['--arg value','--arg2','--arg3']
         for (let i = 0; i < customDaemonArgsArray.length; i++) {
             if(!customDaemonArgsArray[i].startsWith("--")) {

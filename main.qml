@@ -55,7 +55,7 @@ import "version.js" as Version
 
 ApplicationWindow {
     id: appWindow
-    title: "Monero" +
+    title: "BitMonero" +
         (persistentSettings.displayWalletNameInTitleBar && walletName
         ? " - " + walletName
         : "")
@@ -828,7 +828,7 @@ ApplicationWindow {
             walletManager.stopMining()
             p2poolManager.exit()
             middlePanel.advancedView.miningView.update()
-            informationPopup.text += qsTr("\n\nExiting p2pool. Please check that port 18083 is available.") + translationManager.emptyString;
+            informationPopup.text += qsTr("\n\nExiting p2pool. Please check that port 48083 is available.") + translationManager.emptyString;
         }
         informationPopup.icon  = StandardIcon.Critical
         informationPopup.onCloseCallback = null
@@ -2356,11 +2356,11 @@ ApplicationWindow {
     function getDefaultDaemonRpcPort(networkType) {
         switch (parseInt(networkType)) {
             case NetworkType.STAGENET:
-                return 38081;
+                return 64081;
             case NetworkType.TESTNET:
-                return 28081;
+                return 58081;
             default:
-                return 18081;
+                return 48081;
         }
     }
 

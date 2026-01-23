@@ -43,7 +43,7 @@ ColumnLayout {
         Layout.fillWidth: true
         daemonAddrLabelText: qsTr("Remote RPC address") + translationManager.emptyString
         daemonPortLabelText: qsTr("Port") + translationManager.emptyString
-        daemonPortText: "48080"
+        daemonPortText: "48081"
         placeholderFontSize: 15
     }
 

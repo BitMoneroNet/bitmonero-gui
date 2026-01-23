@@ -69,13 +69,13 @@ Rectangle {
 
             MoneroComponents.TextBlock {
                 font.pixelSize: 14
-                text: qsTr("GUI version: ") + translationManager.emptyString
+                text: qsTr("Bitmonero GUI version: ") + translationManager.emptyString
             }
 
             MoneroComponents.TextBlock {
                 font.pixelSize: 14
                 color: MoneroComponents.Style.dimmedFontColor
-                text: Version.GUI_VERSION + " (Qt " + qtRuntimeVersion + ")" + translationManager.emptyString
+                text: Version.GUI_VERSION + " (Bitmonero, Qt " + qtRuntimeVersion + ")" + translationManager.emptyString
             }
 
             Rectangle {
@@ -99,7 +99,7 @@ Rectangle {
             MoneroComponents.TextBlock {
                 id: guiMoneroVersion
                 font.pixelSize: 14
-                text: qsTr("Embedded Monero version: ") + translationManager.emptyString
+                text: qsTr("Embedded Bitmonero daemon version: ") + translationManager.emptyString
             }
 
             MoneroComponents.TextBlock {
@@ -407,9 +407,9 @@ Rectangle {
 
             MoneroComponents.StandardButton {
                 small: true
-                text: qsTr("Donate to Monero") + translationManager.emptyString
+                text: qsTr("Donate to BitMonero") + translationManager.emptyString
                 onClicked: {
-                    middlePanel.sendTo("888tNkZrPN6JsEgekjMnABU4TBzc2Dt29EPAvkRxbANsAnjyPbb3iQ1YBRk1UXcdRsiKc9dhwMVgN5S9cQUiyoogDavup3H", "", qsTr("Donation to Monero Core Team") + translationManager.emptyString);
+                    middlePanel.sendTo("ZB2BcnxZdMgeNcnH3r1no55NXon1ZJH3ndjMPMSozqPJ611up6fuLtyT9aSd4q9QKCeahMgepVrkNhKgUaTiemdf2ZeRnARv8", "", qsTr("Donation to BitMonero Core Team") + translationManager.emptyString);
                 }
             }
         }

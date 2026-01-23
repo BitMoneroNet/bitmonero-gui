@@ -2490,7 +2490,7 @@ You can change the password in the wallet settings.</source>
     </message>
     <message>
         <location filename="../pages/Sign.qml" line="341"/>
-        <source>Enter the Monero Address (example: 44AFFq5kSiGBoZ...)</source>
+        <source>Enter the BitMonero Address (example: ZB2BcnxZdMgeN...)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3097,7 +3097,7 @@ Please upgrade or connect to another daemon</source>
     </message>
     <message>
         <location filename="../components/TxConfirmationDialog.qml" line="311"/>
-        <source>Monero address</source>
+        <source>BitMonero address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

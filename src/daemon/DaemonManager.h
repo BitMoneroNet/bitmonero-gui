@@ -66,6 +66,12 @@ private:
     bool sendCommand(const QStringList &cmd, NetworkType::Type nettype, const QString &dataDir, QString &message) const;
     bool startWatcher(NetworkType::Type nettype, const QString &dataDir) const;
     bool stopWatcher(NetworkType::Type nettype, const QString &dataDir) const;
+    struct Ports {
+        int p2p;
+        int rpc;
+        int zmq;
+    };
+    Ports defaultPorts(NetworkType::Type nettype) const;
 signals:
     void daemonStarted() const;
     void daemonStopped() const;

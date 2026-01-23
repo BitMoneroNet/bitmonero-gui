@@ -154,6 +154,15 @@ Rectangle {
                 }
             }
 
+            Rectangle {
+                Layout.preferredHeight: 1
+                Layout.topMargin: 5
+                Layout.bottomMargin: 10
+                Layout.fillWidth: true
+                color: MoneroComponents.Style.dividerColor
+                opacity: MoneroComponents.Style.dividerOpacity
+            }
+
             WizardHeader {
                 Layout.topMargin: 20
                 title: qsTr("Optional features") + translationManager.emptyString
@@ -163,7 +172,7 @@ Rectangle {
             WizardMenuItem {
                 Layout.topMargin: 20
                 headerText: qsTr("Portable mode") + translationManager.emptyString
-                bodyText: qsTr("Create portable wallets and use them on any PC. Enable if you installed Monero on a USB stick, an external drive, or any other portable storage medium.") + translationManager.emptyString
+                bodyText: qsTr("Create portable wallets and use them on any PC. Enable if you installed BitMonero on a USB stick, an external drive, or any other portable storage medium.") + translationManager.emptyString
                 checkbox: true
                 checked: wizardModeSelection1.portable
 
