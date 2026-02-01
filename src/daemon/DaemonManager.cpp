@@ -299,6 +299,7 @@ bool DaemonManager::sendCommand(const QStringList &cmd, NetworkType::Type nettyp
     }
 
     qDebug() << "sending external cmd: " << external_cmd;
+    emit daemonConsoleUpdated(QString(">>> %1").arg(external_cmd.join(" ")));
 
 
     p.start(m_monerod, external_cmd);

@@ -286,51 +286,49 @@ Rectangle {
                         primary: !stopSoloMinerButton.enabled
                         text: qsTr("Start mining") + translationManager.emptyString
                         onClicked: {
-                            // Allow start if the daemon is running and either local or remote mining is explicitly allowed.
-                            var daemonReady = appWindow.daemonRunning && (!persistentSettings.useRemoteNode || persistentSettings.allowRemoteNodeMining)
-                            if (daemonReady) {
-                                var success;
-                                if (persistentSettings.allow_p2pool_mining) {
-                                    if (p2poolManager.isInstalled()) {
-                                        args = daemonManager.getArgs(persistentSettings.blockchainDataDir) //updates arguments
-                                        if (persistentSettings.allowRemoteNodeMining || (args.includes("--zmq-pub tcp://127.0.0.1:48083") || args.includes("--zmq-pub=tcp://127.0.0.1:48083")) && !args.includes("--no-zmq")) {
-                                            startP2Pool()
-                                        }
-                                        else {
-                                            daemonManager.stopAsync(persistentSettings.nettype, persistentSettings.blockchainDataDir, startP2PoolLocal)
-                                        }
+                            if (persistentSettings.allow_p2pool_mining) {
+                                if (p2poolManager.isInstalled()) {
+                                    args = daemonManager.getArgs(persistentSettings.blockchainDataDir) //updates arguments
+                                    if (persistentSettings.allowRemoteNodeMining || (args.includes("--zmq-pub tcp://127.0.0.1:48083") || args.includes("--zmq-pub=tcp://127.0.0.1:48083")) && !args.includes("--no-zmq")) {
+                                        startP2Pool()
                                     }
                                     else {
-                                        confirmationDialog.title = qsTr("P2Pool installation") + translationManager.emptyString;
-                                        confirmationDialog.text  = qsTr("P2Pool will be installed at %1. Proceed?").arg(applicationDirectory) + translationManager.emptyString;
-                                        confirmationDialog.icon = StandardIcon.Question;
-                                        confirmationDialog.cancelText = qsTr("No") + translationManager.emptyString;
-                                        confirmationDialog.okText = qsTr("Yes") + translationManager.emptyString;
-                                        confirmationDialog.onAcceptedCallback = function() {
-                                            p2poolManager.download();
-                                            statusMessageText.text = "Downloading P2Pool...";
-                                            statusMessage.visible = true
-                                            startSoloMinerButton.enabled = false;
-                                            stopSoloMinerButton.enabled = false;
-                                        }
-                                        confirmationDialog.open();
+                                        daemonManager.stopAsync(persistentSettings.nettype, persistentSettings.blockchainDataDir, startP2PoolLocal)
                                     }
                                 }
-                                else 
-                                {
-                                    // Issue the same start_mining command the log console uses (split string).
-                                    var cmdString = "start_mining " + appWindow.currentWallet.address(0, 0) + " " + threads + " false true"
-                                    daemonManager.sendCommandAsync(cmdString.split(" "), currentWallet.nettype, persistentSettings.blockchainDataDir, function(result) {
-                                        if (result === true) {
-                                            update()
-                                        } else {
-                                            miningError(qsTr("Couldn't start mining.<br>") + translationManager.emptyString)
-                                        }
-                                    })
+                                else {
+                                    confirmationDialog.title = qsTr("P2Pool installation") + translationManager.emptyString;
+                                    confirmationDialog.text  = qsTr("P2Pool will be installed at %1. Proceed?").arg(applicationDirectory) + translationManager.emptyString;
+                                    confirmationDialog.icon = StandardIcon.Question;
+                                    confirmationDialog.cancelText = qsTr("No") + translationManager.emptyString;
+                                    confirmationDialog.okText = qsTr("Yes") + translationManager.emptyString;
+                                    confirmationDialog.onAcceptedCallback = function() {
+                                        p2poolManager.download();
+                                        statusMessageText.text = "Downloading P2Pool...";
+                                        statusMessage.visible = true
+                                        startSoloMinerButton.enabled = false;
+                                        stopSoloMinerButton.enabled = false;
+                                    }
+                                    confirmationDialog.open();
                                 }
                             }
-                            else {
-                                miningError(qsTr("Couldn't start mining.<br>") + translationManager.emptyString)
+                            else 
+                            {
+                                // Issue the same start_mining command as the console tab (identical code path).
+                                var threadsToUse = Math.floor(threads)
+                                if (!threadsToUse || !isFinite(threadsToUse) || threadsToUse < 1) {
+                                    threadsToUse = 1
+                                }
+                                startSoloMinerButton.enabled = false
+                                var cmd = ["start_mining", appWindow.currentWallet.address(0, 0), threadsToUse.toString(), "false", "true"]
+                                daemonManager.sendCommandAsync(cmd, currentWallet.nettype, persistentSettings.blockchainDataDir, function(result) {
+                                    startSoloMinerButton.enabled = true
+                                    if (result === true) {
+                                        update()
+                                    } else {
+                                        miningError(qsTr("Couldn't start mining.<br>") + translationManager.emptyString)
+                                    }
+                                })
                             }
                         }
                     }
@@ -342,9 +340,11 @@ Rectangle {
                         primary: stopSoloMinerButton.enabled
                         text: qsTr("Stop mining") + translationManager.emptyString
                         onClicked: {
-                            walletManager.stopMining()
-                            p2poolManager.exit()
-                            update()
+                            stopSoloMinerButton.enabled = false
+                            daemonManager.sendCommandAsync(["stop_mining"], currentWallet.nettype, persistentSettings.blockchainDataDir, function(result) {
+                                stopSoloMinerButton.enabled = true
+                                update()
+                            })
                         }
                     }
                 }
