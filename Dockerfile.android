@@ -227,7 +227,7 @@ CMD set -ex \
     -DANDROID_TOOLCHAIN=clang \
     -DBoost_USE_STATIC_RUNTIME=ON \
     -DLRELEASE_PATH="${PREFIX}/bin" \
-    -DQT_ANDROID_APPLICATION_BINARY="monero-wallet-gui" \
+    -DQT_ANDROID_APPLICATION_BINARY="bitmonero-wallet-gui" \
     -DANDROID_SDK="${NEW_SDK_ROOT}" \
     -DWITH_SCANNER=ON \
     -DWITH_DESKTOP_ENTRY=OFF \

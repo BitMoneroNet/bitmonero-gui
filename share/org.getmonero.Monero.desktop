@@ -1,8 +1,8 @@
 [Desktop Entry]
-Name=Monero GUI
-GenericName=Monero-GUI
-Comment=Monero GUI
-Exec=monero-wallet-gui
+Name=Bitmonero GUI
+GenericName=Bitmonero-GUI
+Comment=Bitmonero GUI
+Exec=bitmonero-wallet-gui
 Type=Application
 Terminal=false
 Categories=Network;Qt;Finance;Office;

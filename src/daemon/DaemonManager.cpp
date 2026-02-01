@@ -56,7 +56,7 @@ bool DaemonManager::start(const QString &flags, NetworkType::Type nettype, const
         return false;
     }
 
-    // prepare command line arguments and pass to monerod
+    // prepare command line arguments and pass to bitmonerod
     QStringList arguments;
 
     // Start daemon with --detach flag on non-windows platforms
@@ -130,7 +130,7 @@ bool DaemonManager::start(const QString &flags, NetworkType::Type nettype, const
     emit daemonConsoleUpdated(portSummary);
     qDebug() << portSummary;
 
-    qDebug() << "starting monerod " + m_monerod;
+    qDebug() << "starting bitmonerod " + m_monerod;
     qDebug() << "With command line arguments " << arguments;
 
     QMutexLocker locker(&m_daemonMutex);
@@ -141,7 +141,7 @@ bool DaemonManager::start(const QString &flags, NetworkType::Type nettype, const
     connect(m_daemon.get(), SIGNAL(readyReadStandardOutput()), this, SLOT(printOutput()));
     connect(m_daemon.get(), SIGNAL(readyReadStandardError()), this, SLOT(printError()));
 
-    // Start monerod
+    // Start bitmonerod
     bool started = m_daemon->startDetached(m_monerod, arguments);
 
     // add state changed listener
@@ -213,9 +213,9 @@ bool DaemonManager::stopWatcher(NetworkType::Type nettype, const QString &dataDi
             if(counter >= 5) {
                 qDebug() << "Killing it! ";
 #ifdef Q_OS_WIN
-                QProcess::execute("taskkill",  {"/F", "/IM", "monerod.exe"});
+                QProcess::execute("taskkill",  {"/F", "/IM", "bitmonerod.exe"});
 #else
-                QProcess::execute("pkill", {"monerod"});
+                QProcess::execute("pkill", {"bitmonerod"});
 #endif
             }
 
@@ -399,7 +399,7 @@ QString DaemonManager::getArgs(const QString &dataDir) {
     QStringList tempArgs;
     #ifdef Q_OS_WIN
         //powershell
-        tempArgs << "Get-CimInstance Win32_Process -Filter \"name = 'monerod.exe'\" | select -ExpandProperty CommandLine ";
+        tempArgs << "Get-CimInstance Win32_Process -Filter \"name = 'bitmonerod.exe'\" | select -ExpandProperty CommandLine ";
         p.setProgram("powershell");
         p.setArguments(tempArgs);
         p.start();
@@ -408,7 +408,7 @@ QString DaemonManager::getArgs(const QString &dataDir) {
 
     #elif defined(Q_OS_UNIX)
         //pgrep
-        tempArgs << "monerod";
+        tempArgs << "bitmonerod";
         p.setProgram("pgrep");
         p.setArguments(tempArgs);
         p.start();
@@ -460,11 +460,11 @@ DaemonManager::DaemonManager(QObject *parent)
     , m_scheduler(this)
 {
 
-    // Platform depetent path to monerod
+    // Platform depetent path to bitmonerod
 #ifdef Q_OS_WIN
-    m_monerod = QApplication::applicationDirPath() + "/monerod.exe";
+    m_monerod = QApplication::applicationDirPath() + "/bitmonerod.exe";
 #elif defined(Q_OS_UNIX)
-    m_monerod = QApplication::applicationDirPath() + "/monerod";
+    m_monerod = QApplication::applicationDirPath() + "/bitmonerod";
 #endif
 
     if (m_monerod.length() == 0) {
